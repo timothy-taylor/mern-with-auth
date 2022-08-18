@@ -3,6 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
+const JwtStrategy = require("passport-jwt").Strategy;
+const { ExtractJwt } = require("passport-jwt");
 const bcrypt = require("bcryptjs");
 const { config } = require("./config");
 const db = require("./db");
@@ -35,13 +37,27 @@ passport.use(
         if (!user) return done(null, false, { message: "Incorrect username" });
         bcrypt.compare(password, user.password, (err, res) => {
           if (err) return done(err);
-          if (res) return done(null, user, { message: "Logged in successfully" });
+          if (res)
+            return done(null, user, { message: "Logged in successfully" });
 
           return done(null, false, { message: "Incorrect password" });
         });
       });
   })
 );
+
+passport.use(
+  new JwtStrategy(
+    {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: config.jwt.secret,
+    },
+    (jwt_payload, done) => {
+      return done(null, jwt_payload);
+    }
+  )
+);
+
 app.use(passport.initialize());
 
 //
