@@ -1,13 +1,24 @@
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
 const db = require("../../db");
-const { authenticateJWT } = require("./user-services");
 
 module.exports.userController = {
   index: (req, res, next) => {
-    const { status, message, isLoggedIn, err } = authenticateJWT();
-    if (err) return next(err);
-    res.status(status).json({ message, isLoggedIn });
+    passport.authenticate("jwt", { session: false }, (err, payload) => {
+      if (err) return next(err);
+      if (payload) {
+        return res.json({
+          message: "Successfully authenticated",
+          isLoggedIn: true,
+        });
+      }
+
+      return res
+        .status(403)
+        .json({ message: "Authentication unsuccessful", isLoggedIn: false });
+    })(req, res, next);
   },
+
   new: async (req, res, next) => {
     const dbConnection = db.getDb();
     const { username, password } = req.body;
