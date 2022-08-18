@@ -11,22 +11,19 @@ const { config } = require("./config");
 // user object: second argument
 // message: third
 passport.use(
-  new LocalStrategy((username, password, done) => {
+  new LocalStrategy(async (username, password, done) => {
     const dbConnection = db.getDb();
-    dbConnection
-      .collection("authentication")
-      .findOne({ username: username }, (err, user) => {
-        if (err) return done(err);
-        if (!user) return done(null, false, { message: "Incorrect username" });
-        bcrypt.compare(password, user.password, (err, res) => {
-          if (err) return done(err);
-          if (res) {
-            return done(null, user, { message: "Logged in successfully" });
-          }
+    try {
+      const user = await dbConnection.collection("authentication").findOne({ username });
+      if (!user) return done(null, false, { message: "Incorrect username"});
 
-          return done(null, false, { message: "Incorrect password" });
-        });
-      });
+      const result = await bcrypt.compare(password, user.password);
+      if (!result) return done(null, false, { message: "Incorrect password" });
+
+      return done(null, user, { message: "Logged in successfully" });
+    } catch (err) {
+      return done(err);
+    }
   })
 );
 

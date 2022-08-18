@@ -1,19 +1,21 @@
 const { MongoClient } = require("mongodb");
 const { config } = require("../config");
 
-const client = new MongoClient(config.db.url);
 let dbConnection;
+const client = new MongoClient(config.db.url);
 
 module.exports = {
-  connectToServer: () => {
-    client.connect((err, db) => {
-      if (err && !db) console.error(err);
+  connectToServer: async () => {
+    try {
+      const connection = await client.connect();
+      dbConnection = connection.db(config.db.name);
 
-      dbConnection = db.db("the_odin_project");
-
-      if (dbConnection !== undefined) 
+      if (dbConnection !== undefined) {
         console.log("Successfully connected to MongoDB");
-    });
+      }
+    } catch (err) {
+      console.error(err);
+    }
   },
   getDb: () => dbConnection,
 };

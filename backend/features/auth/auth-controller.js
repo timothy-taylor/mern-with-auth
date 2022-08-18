@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 const { config } = require("../../config");
 
 module.exports.authController = {
+  //
+  // new is authenticated at the router using username and password
   new: (req, res) => {
     const user = req.user;
     const jwtOptions = { expiresIn: config.jwt.expires };
