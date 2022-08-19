@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { axiosClient } from "../api/axiosClient";
-import { authAPI } from "../api/auth.js";
+import { httpStatus } from "../api/httpStatus";
+import { authAPI } from "../api/auth";
 import { Label } from "./Label";
-
-const LogOut = ({ handleLogout }) => (
-  <button className="p-4 m-2 border" onClick={() => handleLogout()}>
-    Sign Out
-  </button>
-);
+import { FormHeader } from "./FormHeader";
+import { Button } from "./Button";
 
 const initialState = { username: "", password: "" };
 
@@ -20,23 +17,25 @@ export const LogIn = ({ token, setToken, clearLocalData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const request = authAPI.new(credentials);
+    const requestBody = authAPI.new(credentials);
     try {
-      const result = await axiosClient.request(request);
-      if (result.status === 200) {
-        console.log(result.data);
+      const response = await axiosClient.request(requestBody);
+      if (response.status === httpStatus.CREATED) {
+        console.log(response.data);
+        setToken(response.data.token);
         setCredentials(initialState);
-        setToken(result.data.token);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  if (token) return <LogOut handleLogout={clearLocalData} />;
+  //
+  // a truthy token means the user is logged in
+  if (token) return <Button text="Sign Out" handleClick={clearLocalData} />;
   return (
     <form onSubmit={handleSubmit}>
-      <h1 className="mb-4 font-serif text-3xl">Log In</h1>
+      <FormHeader text="Log In" />
       <Label
         label="username"
         type="text"
@@ -51,7 +50,7 @@ export const LogIn = ({ token, setToken, clearLocalData }) => {
       />
       <button
         type="submit"
-        className="p-4 mt-2 border hover:text-slate-700 hover:bg-white"
+        className="p-4 mt-4 border hover:text-slate-700 hover:bg-white"
       >
         Sign In
       </button>

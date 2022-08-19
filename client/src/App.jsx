@@ -3,19 +3,15 @@ import { LogIn } from "./components/LogIn";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { axiosClient } from "./api/axiosClient.js";
 import { userAPI } from "./api/user.js";
+import { Button } from "./components/Button";
 
-const SecretButton = ({ handleSecret }) => {
-  return (
-    <button className="p-4 m-4 border" onClick={handleSecret}>
-      Secret button
-    </button>
-  );
-};
-
-export function App() {
+export const App = () => {
   const { token, setToken, clearLocalData } = useLocalStorage();
 
-  const handleSecret = async () => {
+  //
+  // calls a protected API route
+  // as an example
+  const handleSecrets = async () => {
     const requestBody = userAPI.index(token);
     try {
       const response = await axiosClient.request(requestBody);
@@ -25,17 +21,20 @@ export function App() {
     }
   };
 
+  const conditionallyRenderSignUp = () => {
+    if (token) return <Button text="Secret Button" handleClick={handleSecrets} />;
+    return (
+      <>
+        <div className="italic m-8 text-slate-300 text-sm">or</div>
+        <SignUp />
+      </>
+    );
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-700 text-2xl text-white">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-slate-700 text-2xl text-white">
       <LogIn {...{ token, setToken, clearLocalData }} />
-      {token ? (
-        <SecretButton {...{ handleSecret }} />
-      ) : (
-        <>
-          <div className="italic m-4">or</div>
-          <SignUp />
-        </>
-      )}
-    </div>
+      {conditionallyRenderSignUp()}
+    </main>
   );
-}
+};

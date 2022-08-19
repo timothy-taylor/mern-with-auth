@@ -6,5 +6,6 @@ export const userAPI = {
       'Authorization': `Bearer ${token}`,
     },
   }),
+
   new: (credentials) => ({ method: "POST", url: "/v1/user/", data: credentials }),
 }
