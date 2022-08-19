@@ -2,13 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
-const { initializePassport } = require("./passport");
+const { initializePassport } = require("./src/auth/passport");
 const { config } = require("./config");
 
 //
 // import routes
-const userRouter = require("./features/users/user-router");
-const authRouter = require("./features/auth/auth-router");
+const userRouter = require("./src/users/user-router");
+const authRouter = require("./src/auth/auth-router");
 
 //
 // initial setup

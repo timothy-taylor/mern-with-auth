@@ -3,8 +3,8 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const db = require("./db");
-const { config } = require("./config");
+const db = require("../../db");
+const { config } = require("../../config");
 
 //
 // passport's strategy 'done' callback takes an error as its first argument
