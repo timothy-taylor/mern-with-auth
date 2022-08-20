@@ -1,6 +1,7 @@
 const { userServices } = require("./user-services");
 const { httpStatus } = require("../constants/httpStatus");
 const { userValidations } = require("./user-validations");
+const { getDb } = require("../../db");
 
 module.exports.userController = {
   //
@@ -12,8 +13,9 @@ module.exports.userController = {
 
   new: async (req, res) => {
     try {
+      const dbConnection = getDb();
       const { username, password } = await userValidations.newSchema.validateAsync(req.body);
-      const user = await userServices.register(username, password);
+      const user = await userServices.register(dbConnection, username, password);
       res.status(httpStatus.CREATED).json(user);
     } catch (err) {
       res.status(httpStatus.BAD_REQUEST).json(err);

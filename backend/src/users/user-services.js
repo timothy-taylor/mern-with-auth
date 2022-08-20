@@ -1,11 +1,9 @@
-const db = require("../../db");
 const bcrypt = require("bcryptjs");
 
 module.exports.userServices = {
-  register: async (username, password) => {
-    const dbConnection = db.getDb();
+  register: async (db, username, password) => {
     const hashedPassword = await bcrypt.hash(password, 10);
-    return await dbConnection
+    return await db
         .collection("authentication")
         .insertOne({ username, password: hashedPassword });
   }

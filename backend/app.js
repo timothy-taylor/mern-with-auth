@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const db = require("./db");
+const { connectToDb } = require("./db");
 const { initializePassport } = require("./src/auth/passport");
 const { config } = require("./config");
 
@@ -12,7 +12,7 @@ const authRouter = require("./src/auth/auth-router");
 
 //
 // initial setup
-db.connectToServer();
+(async () => await connectToDb());
 const app = express();
 
 //
@@ -27,6 +27,13 @@ app.use(initializePassport());
 app.use("/v1/auth/", authRouter);
 app.use("/v1/user/", userRouter);
 
-app.listen(config.server.port, () =>
+const server = app.listen(config.server.port, () =>
   console.log(`Server listening on ${config.server.port}`)
 );
+
+module.exports = {
+  app,
+  disconnectServer: async () => {
+    await server.close()
+  }
+};

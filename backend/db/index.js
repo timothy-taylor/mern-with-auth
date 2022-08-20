@@ -5,7 +5,7 @@ const client = new MongoClient(config.db.url);
 let dbConnection = null;
 
 module.exports = {
-  connectToServer: async () => {
+  connectToDb: async () => {
     try {
       const connection = await client.connect();
       dbConnection = connection.db(config.db.name);
@@ -16,6 +16,11 @@ module.exports = {
     } catch (err) {
       throw new Error(err);
     }
+  },
+  disconnectDb: () => {
+    client
+      .close()
+      .then(() => console.log("Successfully disconnected from MongoDB"));
   },
   getDb: () => dbConnection,
 };
